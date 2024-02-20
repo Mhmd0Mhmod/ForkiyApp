@@ -3,11 +3,14 @@ import { Fraction } from "fractional";
 class RecipeView {
   #parent = document.querySelector(".recipe");
   #data;
+  #errorMessage = `Sorry this recipe not found , Try another one...!`;
+  #message = "";
   #generateMarkup() {
     return `
     <figure class="recipe__fig">
-    <img src="${this.#data.image}" alt="${this.#data.title
-      }" class="recipe__img" />
+    <img src="${this.#data.image}" alt="${
+      this.#data.title
+    }" class="recipe__img" />
     <h1 class="recipe__title">
       <span>${this.#data.title}</span>
     </h1>
@@ -17,7 +20,8 @@ class RecipeView {
       <svg class="recipe__info-icon">
         <use href="${icons}#icon-clock"></use>
       </svg>
-      <span class="recipe__info-data recipe__info-data--minutes">${this.#data.cookingTime
+      <span class="recipe__info-data recipe__info-data--minutes">${
+        this.#data.cookingTime
       }</span>
       <span class="recipe__info-text">minutes</span>
     </div>
@@ -25,7 +29,8 @@ class RecipeView {
       <svg class="recipe__info-icon">
         <use href="${icons}#icon-users"></use>
       </svg>
-      <span class="recipe__info-data recipe__info-data--people">${this.#data.servings
+      <span class="recipe__info-data recipe__info-data--people">${
+        this.#data.servings
       }</span>
       <span class="recipe__info-text">servings</span>
 
@@ -77,19 +82,21 @@ class RecipeView {
     <h2 class="heading--2">How to cook it</h2>
     <p class="recipe__directions-text">
       This recipe was carefully designed and tested by
-      <span class="recipe__publisher">${this.#data.publisher
+      <span class="recipe__publisher">${
+        this.#data.publisher
       }</span>. Please check out
       directions at their website.
     </p>
-    <a class="btn--small recipe__btn" href="${this.#data.sourceUrl
-      }" target="_blank">
+    <a class="btn--small recipe__btn" href="${
+      this.#data.sourceUrl
+    }" target="_blank">
       <span>Directions</span>
       <svg class="search__icon">
         <use href="${icons}#icon-arrow-right"></use>
       </svg>
     </a>
   </div>
-`;
+  `;
   }
   #generateMarkupIngredients(ingredient) {
     return `
@@ -97,10 +104,11 @@ class RecipeView {
         <svg class="recipe__icon">
         <use href="${icons}#icon-check"></use>
         </svg>
-        <div class="recipe__quantity">${ingredient.quantity
-        ? new Fraction(ingredient.quantity).toString()
-        : ""
-      }</div>
+        <div class="recipe__quantity">${
+          ingredient.quantity
+            ? new Fraction(ingredient.quantity).toString()
+            : ""
+        }</div>
         <div class="recipe__description">
         <span class="recipe__unit">${ingredient.unit}</span>
         ${ingredient.description}
@@ -110,6 +118,11 @@ class RecipeView {
   }
   #clear() {
     this.#parent.innerHTML = "";
+  }
+  addHandlerRender(handler) {
+    ["hashchange", "load"].forEach((ev) =>
+      window.addEventListener(ev, handler)
+    );
   }
   renderSpinner = function () {
     const markup = `
@@ -125,6 +138,34 @@ class RecipeView {
   render(data) {
     this.#data = data;
     const markup = this.#generateMarkup();
+    this.#clear();
+    this.#parent.insertAdjacentHTML("afterbegin", markup);
+  }
+  renderMessage(message = this.#message) {
+    const markup = `
+      <div class="message">
+            <div>
+              <svg>
+                <use href="${icons}#icon-smile"></use>
+              </svg>
+            </div>
+            <p>${message}</p>
+          </div> 
+    `;
+    this.#clear();
+    this.#parent.insertAdjacentHTML("afterbegin", markup);
+  }
+  renderError(message = this.#errorMessage) {
+    const markup = `
+      <div class="error">
+            <div>
+              <svg>
+                <use href="${icons}#icon-alert-triangle"></use>
+              </svg>
+            </div>
+            <p>${message}</p>
+          </div> 
+    `;
     this.#clear();
     this.#parent.insertAdjacentHTML("afterbegin", markup);
   }
